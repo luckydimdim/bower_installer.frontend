@@ -1,0 +1,1 @@
+export 'src/bower_installer.dart';

@@ -1,0 +1,7 @@
+name: bower_installer
+description: Installs bower components in subfolders.
+dependencies:
+  barback: ">=0.14.1 <0.16.0"
+  path:
+  grinder:
+  crypto:
