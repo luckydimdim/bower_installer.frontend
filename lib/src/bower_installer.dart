@@ -35,6 +35,8 @@ class BowerInstaller extends AggregateTransformer {
 
       if (path.basename(projectEntity.path) != 'bower.json') continue;
 
+      print('projectPath: '+ path.dirname(projectEntity.path));
+
       String bowerModulesPath =
           path.join(path.dirname(projectEntity.path), 'bower_components');
       Directory bowerModulesDir = new Directory(bowerModulesPath);
