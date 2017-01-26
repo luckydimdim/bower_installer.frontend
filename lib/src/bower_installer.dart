@@ -99,11 +99,14 @@ class BowerInstaller extends AggregateTransformer {
           if (!(moduleEntity is File)) continue;
 
           String destinationModulePath =
-              moduleEntity.path.replaceAll(bowerModulesPath, 'web/vendor');
+            moduleEntity.path.replaceAll(bowerModulesPath, 'web/vendor');
           destinationModulePath = path.normalize(destinationModulePath);
 
+          var destinationModuleFile = new File(destinationModulePath);
+          if ( destinationModuleFile.existsSync() ) continue;
+
           AssetId outputAssetId =
-              new AssetId(transform.package, destinationModulePath);
+            new AssetId(transform.package, destinationModulePath);
 
           Asset outputAsset = new Asset.fromFile(outputAssetId, moduleEntity);
 
