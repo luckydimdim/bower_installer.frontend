@@ -8,6 +8,8 @@ import 'package:crypto/crypto.dart';
 
 /// Installs bower modules in all sub folders
 class BowerInstaller extends AggregateTransformer {
+  BowerInstaller() {}
+
   /// Registers transformer
   BowerInstaller.asPlugin();
 
@@ -104,8 +106,13 @@ class BowerInstaller extends AggregateTransformer {
               new AssetId(transform.package, destinationModulePath);
 
           Asset outputAsset = new Asset.fromFile(outputAssetId, moduleEntity);
-          
-          transform.addOutput(outputAsset);
+
+          try {
+            transform.addOutput(outputAsset);
+          } catch(exception, stackTrace) {
+            print(exception);
+            print(stackTrace);
+          }
         }
         print('module installation done.');
       } else {
