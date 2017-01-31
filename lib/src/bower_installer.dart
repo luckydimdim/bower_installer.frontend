@@ -71,8 +71,12 @@ class BowerInstaller extends AggregateTransformer {
             'bower', ['install'], workingDirectory: workingDirPath,
             runInShell: true);
 
-        result.then((_) {
-          print(bowerModulesPath + ' installed, coping...');
+        result.then((processResult) {
+          print(bowerModulesPath + ' installed with code ${processResult.exitCode}, ' + ((processResult.exitCode == 0)?'coping...':'coping canceled'));
+
+          if (processResult.exitCode > 0){
+            return; // была ошибка, копировать нечего
+          }
 
           String destinationModulesPath =
           path.joinAll([path.current, 'web', 'vendor']);
@@ -101,26 +105,29 @@ class BowerInstaller extends AggregateTransformer {
           List<FileSystemEntity> moduleEntityList =
           bowerModulesDir.listSync(recursive: true, followLinks: false);
 
-          for (FileSystemEntity moduleEntity in moduleEntityList) {
-            if (!(moduleEntity is File)) continue;
+          if (transform != null) {
+            for (FileSystemEntity moduleEntity in moduleEntityList) {
+              if (!(moduleEntity is File)) continue;
 
-            String destinationModulePath =
-            moduleEntity.path.replaceAll(bowerModulesPath, 'web/vendor');
-            destinationModulePath = path.normalize(destinationModulePath);
+              String destinationModulePath =
+              moduleEntity.path.replaceAll(bowerModulesPath, 'web/vendor');
+              destinationModulePath = path.normalize(destinationModulePath);
 
-            var destinationModuleFile = new File(destinationModulePath);
-            if (destinationModuleFile.existsSync()) continue;
+              var destinationModuleFile = new File(destinationModulePath);
+              if (destinationModuleFile.existsSync()) continue;
 
-            AssetId outputAssetId =
-            new AssetId(transform.package, destinationModulePath);
+              AssetId outputAssetId =
+              new AssetId(transform.package, destinationModulePath);
 
-            Asset outputAsset = new Asset.fromFile(outputAssetId, moduleEntity);
+              Asset outputAsset = new Asset.fromFile(
+                  outputAssetId, moduleEntity);
 
-            try {
-              transform.addOutput(outputAsset);
-            } catch (exception, stackTrace) {
-              print(exception);
-              print(stackTrace);
+              try {
+                transform.addOutput(outputAsset);
+              } catch (exception, stackTrace) {
+                print(exception);
+                print(stackTrace);
+              }
             }
           }
 
