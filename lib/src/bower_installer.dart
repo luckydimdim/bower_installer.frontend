@@ -43,7 +43,9 @@ class BowerInstaller extends AggregateTransformer {
       path.join(path.dirname(projectEntity.path), 'bower.lock');
       var lockFile = new File(lockFilePath);
 
-      Digest bowerDigest = await md5.bind((projectEntity as File).openRead()).first;
+      Digest bowerDigest = await md5
+          .bind((projectEntity as File).openRead())
+          .first;
 
       String bowerHash = bowerDigest.toString();
 
@@ -72,9 +74,14 @@ class BowerInstaller extends AggregateTransformer {
             runInShell: true);
 
         result.then((processResult) {
-          print(bowerModulesPath + ' installed with code ${processResult.exitCode}, ' + ((processResult.exitCode == 0)?'coping...':'coping canceled'));
+          print(bowerModulesPath +
+              ' installed with code ${processResult.exitCode}, ' +
+              ((processResult.exitCode == 0)
+                  ? 'coping...'
+                  : 'coping canceled'));
 
-          if (processResult.exitCode > 0){
+          if (processResult.exitCode > 0) {
+            print('stderr: ' + processResult.stderr);
             return; // была ошибка, копировать нечего
           }
 
@@ -86,7 +93,7 @@ class BowerInstaller extends AggregateTransformer {
           try {
             grinder.copyDirectory(bowerModulesDir, destinationModulesDir);
           }
-          catch(e){
+          catch (e) {
             print('error while coping: $e');
             return;
           }
@@ -132,12 +139,10 @@ class BowerInstaller extends AggregateTransformer {
           }
 
           print('module installation done.');
-
         });
 
-        result.whenComplete(()=> completer.complete());
-        result.catchError((e)=> completer.completeError(e));
-
+        result.whenComplete(() => completer.complete());
+        result.catchError((e) => completer.completeError(e));
       } else {
         print(bowerModulesPath + ' exists, doing nothing...');
         completer.complete();
@@ -150,7 +155,6 @@ class BowerInstaller extends AggregateTransformer {
 
   /// Executes installation
   Future apply(AggregateTransform transform) async {
-
     var completer = new Completer();
 
     String startDirPath = path.join(path.current, '.pub');
@@ -166,10 +170,10 @@ class BowerInstaller extends AggregateTransformer {
       jobs.add(job);
     }
 
-    var result =  Future.wait(jobs);
+    var result = Future.wait(jobs);
 
-    result.whenComplete(()=>completer.complete());
-    result.catchError((e)=>completer.completeError(e));
+    result.whenComplete(() => completer.complete());
+    result.catchError((e) => completer.completeError(e));
 
     return completer;
   }

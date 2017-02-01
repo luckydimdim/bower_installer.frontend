@@ -1,10 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 
-import 'package:async/async.dart';
 import 'package:barback/barback.dart';
-import 'package:barback/src/graph/transform_node.dart';
-import 'package:barback/src/utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:grinder/grinder_files.dart' as grinder;
 import 'package:crypto/crypto.dart';
@@ -83,8 +80,12 @@ class BowerInstaller extends AggregateTransformer {
         result.then((processResult) {
           print(bowerModulesPath + ' installed with code ${processResult.exitCode}, ' + ((processResult.exitCode == 0)?'coping...':'coping canceled'));
 
-          if (processResult.exitCode > 0){
+          if (processResult.exitCode > 0) {
+            print('stderr: ' + processResult.stderr);
             return; // была ошибка, копировать нечего
+          }
+          else {
+            print('stdout: ' + processResult.stdout);
           }
 
           String destinationModulesPath =
